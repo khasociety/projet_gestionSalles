@@ -9,7 +9,6 @@ int main() {
 	SetConsoleOutputCP(CP_UTF8);
     int choix;
     do {	
-    	
         printf("Gestion des réservations de salles de la section informatique\n");
         printf("------------------------------------------------------------------\n");
         printf("1: Gestion des salles\n");
@@ -35,7 +34,6 @@ int main() {
             default:
                 printf("\nChoix invalide\n");
         } 
-          //getch();
            printf("\nAppuyez sur Entrée pour continuer...\n");
            getchar(); getchar();
     } while (choix != 4);
