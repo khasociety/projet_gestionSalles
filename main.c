@@ -10,7 +10,6 @@ int main() {
     int choix;
     do {	
     	
-    	system("cls");
         printf("Gestion des réservations de salles de la section informatique\n");
         printf("------------------------------------------------------------------\n");
         printf("1: Gestion des salles\n");
