@@ -1,2 +1,0 @@
-1	rc 1	44	Non
-2	rc 2	78	Non
