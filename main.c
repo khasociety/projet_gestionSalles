@@ -9,7 +9,7 @@ int main() {
 	SetConsoleOutputCP(CP_UTF8);
     int choix;
     do {	
-    	//clrscr();
+    	
     	system("cls");
         printf("Gestion des réservations de salles de la section informatique\n");
         printf("------------------------------------------------------------------\n");
