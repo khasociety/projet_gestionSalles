@@ -18,7 +18,7 @@ int est_ce_que_le_code_existe(int code, char* fname){
     printf("Echec de l'Ouverture du fichier !!\n");
 	  return 2;
    }
-   while ( fscanf(fp,"%d\t%s\t%d\t%s\n", &salle.code_unique, salle.position, &salle.capacite, &salle.disponibilite_machines) == 4)
+   while ( fscanf(fp,"%d\t%[^\t]\t%d\t%s\n", &salle.code_unique, salle.position, &salle.capacite, &salle.disponibilite_machines) == 4)
    {
      if(code == salle.code_unique){
         return 1;
@@ -142,7 +142,7 @@ void Rechercher_une_salle_a_partir_de_son_code(char * fname){
     getchar(); //getchar();
 }
 	                                       	
-/*void Modifier_une_salle_connue(char * fname){
+void Modifier_une_salle_connue(char * fname){
 	
 	 FILE * fp , *fp_edit;
 	 int code, dispo_machine;
@@ -204,16 +204,17 @@ void Rechercher_une_salle_a_partir_de_son_code(char * fname){
 			fprintf(fp_edit,"%d\t%s\t%d\t%s\n", salle_tmp.code_unique, salle_tmp.position, salle_tmp.capacite, salle_tmp.disponibilite_machines);
 			}
 		}
-	   fflush(fp_edit);  // Force l'écriture du buffer vers le disque
        fclose(fp);
 	   fclose(fp_edit);
+	   fcloseall();
 	   
 	   printf("Tentative de suppression du fichier : %s\n", fname);
 	   
 	   if (remove(fname) != 0) {
          perror("Erreur de suppression");
-         //return; // Arreter si la suppression echoue
+         return; // Arreter si la suppression echoue
 		}
+	  else printf("Salle modifiee avec sucee \n");
 	  
 	     if (rename("new_file.txt", fname) != 0) {
 	     perror("Erreur de renommage");
@@ -225,92 +226,6 @@ void Rechercher_une_salle_a_partir_de_son_code(char * fname){
 	 
    	printf("\nAppuyez sur Entrée pour continuer...\n");
     getchar(); getchar();
-}*/
-
-
-void Modifier_une_salle_connue(char * fname){
-    FILE *fp = NULL, *fp_edit = NULL;
-    int code, dispo_machine;
-    salle salle, salle_temp;
-
-    system("cls");
-    printf("________________________________________________\n");
-    printf("     === MODIFICATION D'UNE SALLE ===\n");
-    printf("------------------------------------------------\n");
-
-    printf("Donner le code de la salle a modifier: ");
-    scanf("%d", &code);
-    getchar();
-
-    if (est_ce_que_le_code_existe(code, fname) == 1){
-        // Ouvre l'original en lecture
-        fp = fopen(fname, "rt");
-        if (fp == NULL) {
-            printf("Erreur d'ouverture de %s\n", fname);
-            return;
-        }
-
-        // Ouvre le fichier temporaire
-        fp_edit = fopen("new_file.txt", "wt");
-        if (fp_edit == NULL) {
-            printf("Erreur d'ouverture du fichier temporaire\n");
-            fclose(fp);
-            return;
-        }
-
-        // Saisie des nouvelles infos
-        salle.code_unique = code;
-        printf("Position: ");
-        fgets(salle.position, sizeof(salle.position), stdin);
-        salle.position[strcspn(salle.position, "\n")] = '\0';
-
-        do {
-            printf("Capacite : ");
-            scanf("%d", &salle.capacite);
-        } while(salle.capacite < 0);
-
-        do {
-            printf("Disponibilite machines:\n1:Oui\n2:Non\nEntrer votre choix: ");
-            scanf("%d", &dispo_machine);
-        } while(dispo_machine != 1 && dispo_machine != 2);
-
-        strcpy(salle.disponibilite_machines, (dispo_machine == 1) ? "Oui" : "Non");
-
-        // Lecture de l'ancien fichier et copie dans le nouveau
-        while (fscanf(fp, "%d\t%[^\t]\t%d\t%s\n", &salle_temp.code_unique,
-                      salle_temp.position, &salle_temp.capacite,
-                      salle_temp.disponibilite_machines) == 4) {
-            if (salle_temp.code_unique == code) {
-                fprintf(fp_edit, "%d\t%s\t%d\t%s\n", salle.code_unique, salle.position, salle.capacite, salle.disponibilite_machines);
-            } else {
-                fprintf(fp_edit, "%d\t%s\t%d\t%s\n", salle_temp.code_unique, salle_temp.position, salle_temp.capacite, salle_temp.disponibilite_machines);
-            }
-        }
-fflush(fp_edit);
-        if (fp) fclose(fp);
-       if (fp_edit) fclose(fp_edit);
-		         
-				FILE *test = fopen(fname, "a");
-		if (test == NULL) {
-		    printf("[DEBUG] Le fichier %s est ENCORE VERROUILLÉ\n", fname);
-		} else {
-		    printf("[DEBUG] Le fichier %s est LIBRE\n", fname);
-		    fclose(test);
-		}
-
-        if (remove(fname) != 0) {
-            perror("Erreur de suppression");
-        } else if (rename("new_file.txt", fname) != 0) {
-            perror("Erreur de renommage");
-        } else {
-            printf("Modification réussie !\n");
-        }
-    } else {
-        printf("La salle avec le code %d n'existe pas !\n", code);
-    }
-
-    printf("\nAppuyez sur Entrée pour continuer...\n");
-    getchar(); getchar();
 }
 
 
@@ -320,17 +235,7 @@ void Supprimer_une_salle_connue(char * fname){
 	 int code;
 	 salle salle;
 	 
-	 fp = fopen (fname, "rt");
-	 if(fp == NULL){
-	    printf("Echec de l'Ouverture du fichier !!\n");
-		return;
-	   }
-
-	fp_edit = fopen ("new_file.txt", "wt");
-	 if(fp_edit == NULL){
-	    printf("Echec de l'ouverture du fichier !!\n");
-		return;
-	   }
+	 
 	
 	    system("cls");
 		printf("________________________________________________\n");
@@ -340,31 +245,43 @@ void Supprimer_une_salle_connue(char * fname){
 		printf("Donner le code de la salle a supprimer: ");
 		scanf("%d", &code);
 		getchar();
+
 	if (est_ce_que_le_code_existe(code, fname) == 1){
 
-			while ( fscanf(fp,"%d\t%[^\t]\t%d\t%s\n", &salle.code_unique, salle.position, &salle.capacite, &salle.disponibilite_machines) == 4){
-			    if(salle.code_unique != code){
-				fprintf(fp_edit,"%d\t%s\t%d\t%s\n", salle.code_unique, salle.position, salle.capacite, salle.disponibilite_machines);
+			fp = fopen (fname, "rt");
+		if(fp == NULL){
+			printf("Echec de l'Ouverture du fichier !!\n");
+			return;
+		}
+
+		fp_edit = fopen ("new_file.txt", "wt");
+		if(fp_edit == NULL){
+			printf("Echec de l'ouverture du fichier !!\n");
+			return;
+
+		}
+				while ( fscanf(fp,"%d\t%[^\t]\t%d\t%s\n", &salle.code_unique, salle.position, &salle.capacite, salle.disponibilite_machines) == 4){
+					if(salle.code_unique != code){
+					fprintf(fp_edit,"%d\t%s\t%d\t%s\n", salle.code_unique, salle.position, salle.capacite, salle.disponibilite_machines);
+				}
 			}
-		}
-       fclose(fp);
-	   fclose(fp_edit);
-	   
-	   printf("Tentative de suppression du fichier : %s\n", fname);
-	   
-	   if (remove(fname) != 0) {
-         perror("Erreur de suppression");
-		}
-	  
-	     if (rename("new_file.txt", fname) != 0) {
-	     perror("Erreur de renommage");
-		 }
-	  printf("Salle supprimee avec succès !\n");
-	  }
-	else{
 		fclose(fp);
-        fclose(fp_edit);
-        remove("new_file.txt");
+		fclose(fp_edit);
+		_fcloseall();
+		
+		printf("Tentative de suppression du fichier : %s\n", fname);
+		
+		if (remove(fname) != 0) {
+			perror("Erreur de suppression");
+			}
+		else printf("Salle supprimee avec succès !\n");
+
+			if (rename("new_file.txt", fname) != 0) {
+			perror("Erreur de renommage");
+			}
+	}
+	else{
+		
         printf("La salle avec le code %d n'existe pas !\n", code);
 	   } 
 	 

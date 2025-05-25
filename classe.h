@@ -140,7 +140,6 @@ void Rechercher_une_classe_a_partir_de_son_code(char * fname){
 } 
 
 void  Modifier_une_classe_connue(char * fname){
-
    
 	 FILE * fp , *fp_edit;
 	 int code;
@@ -154,6 +153,7 @@ void  Modifier_une_classe_connue(char * fname){
 		printf("Donner le code de la classe a modifier: ");
 		scanf("%d", &code);
 		getchar();
+
 	if (est_ce_que_la_classe_existe(code, fname) == 1){
 
       fp_edit = fopen ("new_file.txt", "wt");
@@ -180,25 +180,34 @@ void  Modifier_une_classe_connue(char * fname){
 
      fprintf(fp_edit,"%d\t%s\t%s\t%d\n", classe.code_unique, classe.nom, classe.niveau, classe.effectif );
 
+	 fp = fopen ( fname, "r");
+	 if(fp == NULL){
+	    printf("Echec de l'Ouverture du fichier !!\n");
+		return;
+	   }
 
-      while ( fscanf(fp,"%d\t%s\t%s\t%d\n", &classe.code_unique, classe.nom, classe.niveau, &classe.effectif )== 4){
+      while ( fscanf (fp, "%d\t%[^\t]\t%s\t%d\n", &classe.code_unique, classe.nom, classe.niveau, &classe.effectif )== 4){
+		
          if(code != classe.code_unique){
             fprintf(fp_edit,"%d\t%s\t%s\t%d\n", classe.code_unique, classe.nom, classe.niveau, classe.effectif );
          }
+		 
       }
       fclose(fp);
-			fclose(fp_edit);
+	  fclose(fp_edit);
+	  _fcloseall();
 			
 			printf("Tentative de suppression du fichier : %s\n", fname);
 			
 			if (remove(fname) != 0) {
 				perror("Erreur de suppression");
 				}
+			else printf("Classe modifiée avec succès !\n");
 			
 				if (rename("new_file.txt", fname) != 0) {
 				perror("Erreur de renommage");
 				}
-			printf("Classe modifiée avec succès !\n");
+			
   }
   else{
     printf("La classe avec le code %d n'existe pas !\n", code);
@@ -208,7 +217,68 @@ void  Modifier_une_classe_connue(char * fname){
    getchar(); getchar();
 }
 
-void Supprimer_une_classe_connue(void);
+void Supprimer_une_classe_connue(char * fname){
+
+   
+	 FILE * fp , *fp_edit;
+	 int code;
+	 classe classe;
+	
+	    system("cls");
+		printf("________________________________________________\n");
+		printf("     === SUPPRESSION D'UNE CLASSE ===\n");    
+		printf("------------------------------------------------\n");
+		
+		printf("Donner le code de la classe a supprimer: ");
+		scanf("%d", &code);
+		getchar();
+
+	if (est_ce_que_la_classe_existe(code, fname) == 1){
+
+      fp_edit = fopen ("new_file.txt", "wt");
+      if(fp_edit == NULL){
+         printf("Echec de l'ouverture du fichier !!\n");
+         return;
+         }
+			classe.code_unique = code;
+
+	 fp = fopen ( fname, "r");
+	 if(fp == NULL){
+	    printf("Echec de l'Ouverture du fichier !!\n");
+		return;
+	   }
+
+      while ( fscanf (fp, "%d\t%[^\t]\t%s\t%d\n", &classe.code_unique, classe.nom, classe.niveau, &classe.effectif )== 4){
+		
+         if(code != classe.code_unique){
+            fprintf(fp_edit,"%d\t%s\t%s\t%d\n", classe.code_unique, classe.nom, classe.niveau, classe.effectif );
+         }
+		 
+      }
+      fclose(fp);
+	  fclose(fp_edit);
+	  _fcloseall();
+			
+			printf("Tentative de suppression du fichier : %s\n", fname);
+			
+			if (remove(fname) != 0) {
+				perror("Erreur de suppression");
+				}
+			else printf("Classe supprimee avec succès !\n");
+			
+				if (rename("new_file.txt", fname) != 0) {
+				perror("Erreur de renommage");
+				}
+			
+  }
+  else{
+    printf("La classe avec le code %d n'existe pas !\n", code);
+  }
+   
+   printf("\nAppuyez sur Entrée pour continuer...\n");
+   getchar(); getchar();
+
+}
 
 
 void menu_Gestion_des_classes(){
@@ -246,7 +316,7 @@ char fclasse[] = "classe.txt";
                 Modifier_une_classe_connue(fclasse);
 				break;
             case 5:
-               // Supprimer_une_classe_connue(fclasse);
+                 Supprimer_une_classe_connue(fclasse);
 				break;
              case 6:
 				break;
